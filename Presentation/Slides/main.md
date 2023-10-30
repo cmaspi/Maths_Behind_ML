@@ -35,8 +35,6 @@ img[alt~="center"] {
 
 1) **Generative model:** PPCA is a generative model. It can generate new data samples from the learned model.
 2) **Missing Data:** PCA cannot handle missing data well. PPCA can naturally handle missing data by considering it as a part of the probabilistic model and estimating it along with other parameters
-3) **Outliers:** PCA is sensitive to outliers because it seeks to minimize the reconstruction loss. PPCA is robust to outliers because it accounts for noise in the data.
-
 ---
 
 ##### Theory
@@ -192,7 +190,7 @@ X_1 | X_2=x_2 \sim \mathcal{N}\left( \mu_1 + \Sigma_{12}\Sigma_{22}^{-1}(x_2-\mu
 \end{align}
 $$
 
-
+<!-- _footer: Proof https://statproofbook.github.io/P/mvn-cond.html-->
 
 ---
 
@@ -223,7 +221,7 @@ Using the affine transform property, we get
 $$
 \begin{align}
 x \sim \mathcal{N}\left( 0 , WW^T+\sigma^2I \right)
-\end{align}
+\end{align} \tag{1}
 $$
 Define $C:=WW^T+\sigma^2I$
 
@@ -247,7 +245,7 @@ p(x,z) &\propto \exp\left(
     \begin{bmatrix} \frac{1}{\sigma^2}I& \frac{-1}{\sigma^2}W \\
     \frac{-1}{\sigma^2}W^T & \frac{1}{\sigma^2}W^T W + I \end{bmatrix}
     \begin{bmatrix}x \\ z\end{bmatrix}
-  \right)
+  \right) \tag{2}
 \end{align}
 $$
 
@@ -280,7 +278,7 @@ $$
 We get,
 $$
 \begin{align}
-z|x \sim \mathcal{N}\left(M^{-1}W^Tx, \sigma^2M^{-1}\right), \quad where \, M = W^TW+\sigma^2I
+z|x \sim \mathcal{N}\left(M^{-1}W^Tx, \sigma^2M^{-1}\right), \quad where \, M = W^TW+\sigma^2I \tag{3}
 \end{align}
 $$
 
@@ -301,10 +299,10 @@ $$
 # Maximizing the log-likelihood
 $$
 \begin{align}
-L = -\frac{N}{2}\left\{
+\mathcal{L} = -\frac{N}{2}\left\{
     d\ln(2\pi)+\ln|C|+tr(C^{-1}S)
 \right\}
-\end{align}
+\end{align}\tag{3}
 $$
 where
 $$S = \frac{1}{N}\sum_{k=1}^{N}x_k x_k^T$$
@@ -314,7 +312,7 @@ $$S = \frac{1}{N}\sum_{k=1}^{N}x_k x_k^T$$
 # Contd.
 $$
 \begin{align}
-\frac{\partial L}{\partial W} &= N\left(C^{-1}SC^{-1}W - C^{-1}W\right)\\
+\frac{\partial \mathcal{L}}{\partial W} &= N\left(C^{-1}SC^{-1}W - C^{-1}W\right)\\
 &SC^{-1}W = W
 \end{align}
 $$
@@ -370,31 +368,89 @@ $$
 ---
 
 # Contd.
+For $l_j \neq 0$
 $$
 \begin{align}
 Su_j = \left(\sigma^2+l_j^2\right)u_j
 \end{align}
 $$
-Therefore, each column of $U$ must be an eigenvector of $S$, with corresponding eigen value $\lambda_j = \sigma^2+l_j^2$. So,
+Therefore, each column of $U$ must be an eigenvector of $S$, with corresponding eigenvalue $\lambda_j = \sigma^2+l_j^2$. So,
 $$
 \begin{align}
-l_j = (\lambda_j-\sigma^2)^{1/2}
+l_j = (\lambda_j-\sigma^2)^{1/2} \tag{5}
 \end{align}
 $$
+
+---
+
+# Contd. 
+
 Therefore,
 $$
 \begin{align}
 W = U\left(K_n-\sigma^2I\right)^{1/2}R
 \end{align}
 $$
-where $K_n$ is a $n\times n$ diagonal matrix with elements $\lambda_i$ correspoding to eigenvector $u_i$
+
+where $K_n$ is a $n\times n$ diagonal matrix
+
+$$
+k_{jj} = \begin{cases}\lambda_j & \text{eigenvalue corresponding to }u_j\\
+\sigma^2 & o/w\end{cases}
+
+$$
+
+$R$ is any rotation matrix.
 
 ---
 
 # Contd.
+$$
+\begin{align}
+C &= WW^T+\sigma^2I\\
+&= ULV^TVLU^T+\sigma^2I\\
+&= UL^2U^T+\sigma^2I\\
+|C| &= |UL^2U^T+\sigma^2I|
+\end{align}
+$$
+Identity: $|I+AB| = |I+BA|$
+$$\therefore |C| = |\sigma^2I+L^2| \tag{6}$$
+
+---
+# Contd.
+
+Using (4) and (5)
+
+$$\mathcal{L} = -\frac{N}{2}\left\{d \ln(2\pi)+\frac{1}{\sigma^2}\sum_{j=1}^{q'}\ln(\lambda_j)+(d-q')ln(\sigma^2)+q' \right\}$$
+
+Minimizing wrt $\sigma$
+
+$$\sigma^2=\frac{1}{d-q'}\sum_{j=q'+1}^{d}\lambda_j$$
+
+If $\sigma^2>0$, then the $Rank(S)>n$
+
+---
+
+# Contd.
+$$\mathcal{L} = -\frac{N}{2}\left\{d \ln(2\pi)+\sum_{j=1}^{q'}\ln\lambda_j+(d-q')ln\left(\frac{1}{d-q'}\sum_{j=q'+1}^{d}\lambda_j\right)+d \right\}$$
+
+Define $A:= \sum_{j} \ln{\lambda_j}$
+Define $E := \ln\left(\frac{1}{d-q'}\sum_{j=q'+1}^{d}\lambda_j\right) - \frac{1}{d-q'}\sum_{j=q'+1}^{d}\ln\lambda_j$
 
 
+The minimization of $E$ only leads to the requirement of $\lambda_j$ to be adjacent in the spectrum of eigenvalues (why?). Using (5), we conclude that the smallest $d-q'$ values should be discarded.
 
+---
+
+# Contd.
+We can write $E$ from the previous slide in an equivalent way as follows.
+$$E = \ln{x^Te} - \frac{1}{n}\sum_{i=1}^{n}\ln x_i$$
+
+$$\nabla_x E = \frac{e}{x^Te} - \frac{1}{n}\sum_{i=1}^{n}\frac{e_i}{e_i^Tx}$$
+
+The above is $0$ when all components of $x$ are equal.
+
+<!-- _footer: https://math.stackexchange.com/questions/4795075/prove-that-the-discarded-eigenvalues-should-be-adjacent-in-probabilistic-pca-->
 ---
 
 # Equivalence with PCA
@@ -427,7 +483,7 @@ $$
 
 The reconstruction obtained here would be the same as PCA.
 
-<!-- _footer: -->
+<!-- _footer: https://github.com/cmaspi/Maths_Behind_ML/blob/main/Presentation/comparison_with_pca.ipynb -->
 
 ---
 
@@ -486,14 +542,35 @@ class PPCA:
 
 # Data Generation
 ![center w:500](figs/data_gen.png)
+<!-- _footer: https://github.com/cmaspi/Maths_Behind_ML/blob/main/Presentation/data_generation.ipynb-->
 
 ---
 
-# Missing Data (Inference)
+# Missing Data
 **Problem** certain components of a given datapoint $x$ are not known.
 
 We can solve the problem $\langle x_i | x \backslash x_i\rangle$ using the conditional property of gaussians.
 
+<hr>
+
+Alternatively, we can directly obtain the latent representation using first marginalization and then conditioning.
+
+<!-- _footer: Left as an excercise-->
 ---
+
+##### Further Reading
+
+---
+
+1. Heteroscedasticity: The noise doesn't follow homoscedasticity
+ https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf, page: 583-586
+2. Bayesian PCA: Find the number of components for latent space.
+https://proceedings.neurips.cc/paper_files/paper/1998/file/c88d8d0a6097754525e02c2246d8d27f-Paper.pdf
+3. Outlier Detection: https://www.sciencedirect.com/science/article/pii/S0167947309001248
+
+
+
+
+
 
 
