@@ -6,8 +6,11 @@
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{float}
+\usepackage{fancyhdr}
 \usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
-
+\usepackage{xcolor}
+\usepackage{lipsum}
+\usepackage{etoolbox}
 
 % Support for easy cross-referencing
 \usepackage[capitalize]{cleveref}
@@ -16,19 +19,35 @@
 \Crefname{table}{Table}{Tables}
 \crefname{table}{Tab.}{Tabs.}
 
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\footrule}{\hrule width\headwidth height\footrulewidth \vskip \footruleskip}
+% \definecolor{footergray}{gray}{0.5}
+
+\makeatletter
+\patchcmd{\f@nch@foot}{\rlap}{\color{gray}\rlap}{}{}
+\patchcmd{\footrule}{\hrule}{\color{gray}\hrule}{}{}
+\patchcmd{\@maketitle}{\raggedright}{\centering}{}{}
+\patchcmd{\@maketitle}{\raggedright}{\centering}{}{}
+\makeatother
 
 %%%%%%%%% TITLE 
 \title{Probabilistic Principal Component Analysis}
 
+\begin{document}
+
 \author{Chirag Mehta \\ \href{mailto:ai20btech11006@iith.ac.in}{ai20btech11006@iith.ac.in}}
 
-\begin{document}
 \maketitle
+
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
     Principal Component Analysis (PCA) is a widely used method for analyzing and processing data, although it lacks a foundation in a probability model. In this article, we look at the utilization of maximum-likelihood estimation in a latent variable model closely linked to factor analysis to identify the principal axes of observed data vectors. We explore the characteristics of the corresponding likelihood function and highlight the benefits offered by this probabilistic approach through illustrative examples.
 \end{abstract}
+
+\thispagestyle{fancy}
+\fancyfoot[C]{\small All code can be found at \href{https://github.com/cmaspi/Maths_Behind_ML/tree/main/Presentation}{\url{https://github.com/cmaspi/Maths_Behind_ML/tree/main/Presentation}}}
+
 
 %%%%%%%%% BODY TEXT
 \section{Introduction}
@@ -252,7 +271,7 @@ If $\sigma^2>0$, then the $Rank(S)>n$
 
 Interestingly, the minimization of $E$ only leads to the requirement of $\lambda_j$ to be adjacent in the spectrum of eigenvalues. Since the diagonal entries in $K$ have to be at least as big as $\sigma^2$, the biggest $q$ eigenvalues are considered in the $K$ matrix.
 
-\section{Observations and Results}
+\section{Observations}
 
 \subsection{Equivalence with PCA}
 It can be seen that, when $\sigma^2 \rightarrow 0$, $M^{-1}\rightarrow(W^TW)^{-1}$.
@@ -277,7 +296,7 @@ The above equation doesn't represent an orthogonal projection of $z$ and is ther
 \tilde x = W (W^TW)^{-1}M \langle z|x \rangle
 \end{align}
 
-The reconstruction obtained here would be the same as PCA.
+The reconstruction obtained here would be the same as PCA. An example for this has been included in the sample notebooks.
 
 \subsection{Data Generation}
 We have already obtained distribution of $x|z$ in section 3. Using this we can generate more data. One exmaple where this would be useful is when one has limited samples of a defective class and more data is required to train a classifier, this technique could be used to generate more samples. In figure \ref{fig:data_gen}, we can see that the augmented data is similar to the actual data.
@@ -289,8 +308,12 @@ We have already obtained distribution of $x|z$ in section 3. Using this we can g
     \label{fig:data_gen}
 \end{figure}
 
+\subsection{Data Imputation}
+We aren't just limited to generating entirely new data, we can also fill in the missing values for features in a given data point. This can be achieved using the conditional property of gaussians. An example for this has been included in the sample notebooks.
+
 \section{Conclusion and Further Reading}
 In this article we delved into the theory of proababilistic PCA. We saw how principal component analysis can be viewed as a maximum-likelihood procedure based on a probability density model of the observed data. We derived the closed form solution to obtain $W$. We saw that PPCA is as good as PCA in terms of reconstruction but also has the ability to generate more data and also it can be used as an imputation technique.
+
 
 \subsection{Further Reading}
 
