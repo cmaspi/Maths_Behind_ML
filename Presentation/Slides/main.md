@@ -27,6 +27,8 @@ img[alt~="center"] {
 3) Applications
 4) Further Reading
 
+<!-- _footer: All code is available at https://github.com/cmaspi/Maths_Behind_ML/tree/main/Presentation -->
+
 ---
 
 ##### Motivation
