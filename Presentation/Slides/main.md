@@ -544,7 +544,7 @@ class PPCA:
 
 # Data Generation
 ![center w:500](figs/data_gen.png)
-<!-- _footer: https://github.com/cmaspi/Maths_Behind_ML/blob/main/Presentation/data_generation.ipynb-->
+<!-- _footer: https://github.com/cmaspi/Maths_Behind_ML/blob/main/Presentation/sample%20notebooks/data_generation.ipynb-->
 
 ---
 
